@@ -1,0 +1,103 @@
+<html>
+<head>
+<script src="https://unpkg.com/vue"></script>
+<script>
+function loadDoc(endpoint) {
+  var key = document.querySelector('#apiKey').value;
+  //use AWS api gateway as a proxy to get around setting up CORS
+  var url = 'https://xcm8q62sz2.execute-api.us-west-2.amazonaws.com/beta/'+endpoint;
+  var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", url, false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.setRequestHeader("accesskey", key);
+    xhttp.setRequestHeader("outputtype", "json");
+    xhttp.send();
+    var response = JSON.parse(xhttp.responseText);
+    return response[2]['url'];
+}
+</script>
+</head>
+<body>
+<div id="app-1">
+  <p>
+    <div id="codeIn" class="ib">
+      <textarea id="tex" v-model="rawHtml"></textarea>
+    </div>
+    <div id="codeOut" class="ib" v-html="rawHtml" ></div>
+</div>
+<div id="app2">
+
+  <p >
+  <button type="button" onclick="loadDoc()">Request data from API</button>
+<p id="demo">API Key: <input id="apiKey"/></p>
+</p>
+
+  <h2>Create Form</h2>
+  <div id="create">
+    <p>
+      <input type="button" value="Opening form tag with action url" onclick="create('action')"/>
+      <input type="button" value="All basic fields" onclick="create('basic')"/>
+      <input type="button" value="Input" onclick="create('input')"/>
+      <input type="button" value="Submit" onclick="create('submit')"/>
+    </p>
+  </div>
+  <h3>Generated code:</h3>
+  <div id="suggestCode"></div>
+</div>
+<script>
+//vue bind textarea to div
+var app1 = new Vue({
+  el: '#app-1',
+  data: {
+    rawHtml: '<!-- Add form html below, Preview area to the right-->'
+  }
+})
+
+
+//create
+function create(step){
+  switch(step){
+    case 'action':
+        var actionURL = loadDoc('systemlinks');
+        document.querySelector('#suggestCode').innerText='<form action ="'+actionURL+'" method="GET" target="_blank">';
+        break;
+    case 'basic':
+        document.querySelector('#suggestCode').innerText='<input type="text" name="lp" id="searchIDX-lp" value="" class="searchIDX-input" />\n'+
+        '<input type="text" name="hp" id="searchIDX-hp" value="" />\n'+
+        '<select id="searchIDX-bd" name="bd" class="searchIDX-select" autocomplete="off">\n<option value="">Any Number</option>\n<option value="0">Studio</option>\n<option value="1">1+</option>\n<option value="2">2+</option>\n<option value="3">3+</option>\n<option value="4">4+</option>\n<option value="5">5+</option>\n<option value="6">6+</option>\n<option value="7">7+</option>\n<option value="8">8+</option>\n<option value="9">9+</option>\n<option value="10">10+</option>\n</select>\n'+
+        '<select id="searchIDX-tb" name="tb" class="searchIDX-select" autocomplete="off">\n<option value="">Any Number</option>\n<option value="1">1+</option>\n<option value="2">2+</option>\n<option value="3">3+</option>\n<option value="4">4+</option>\n<option value="5">5+</option>\n<option value="6">6+</option>\n<option value="7">7+</option>\n<option value="8">8+</option>\n<option value="9">9+</option>\n<option value="10">10+</option>\n</select>\n'+
+        '<input type="text" name="sqft" id="searchDX-sqft" value="" />\n'+
+        '<input type="text" name="acres" id="IDX-acres" value="" />\n';
+        break;
+    case 'input':
+        document.querySelector('#suggestCode').innerText='<input type="text" value="test" />';
+        break;
+    case 'submit':
+        document.querySelector('#suggestCode').innerText='<input type="submit" />';
+        break;
+      }
+  }
+</script>
+<style>
+.ib{
+  display: inline-block;
+  width: 40%;
+  padding-left:10px;
+}
+#codeIn{
+  position: relative;
+}
+#codeOut{
+  position: fixed;
+}
+textarea {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+
+	width: 100%;
+  height: 50%;
+}
+</style>
+</body>
+</html>
